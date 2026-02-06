@@ -5,7 +5,6 @@ using UnityEngine;
 using System.Collections;
 using System.Linq;
 using UnityEngine.SceneManagement;
-using Unity.Mathematics;
 using TMPro;
 using UnityEngine.InputSystem;
 using Unity.VisualScripting;
@@ -59,6 +58,7 @@ public class RubiksCubeManager : MonoBehaviour
     public TMP_Text scrolldirText;
     public TMP_Text selectedCubeText;
     public TMP_Text selectedFaceText;
+    public bool inputLocked = false;
     
     public Dictionary<CameraHoriz, Vector3> cameraVectors = new Dictionary<CameraHoriz, Vector3>()
     {
@@ -158,25 +158,51 @@ public class RubiksCubeManager : MonoBehaviour
         
     }
     IEnumerator DemoScramble()
+    {   
+        yield return StartCoroutine(RotateFace(Side.Right, RotateDir.CW));
+        yield return StartCoroutine(RotateFace(Side.Left, RotateDir.CW));
+        yield return StartCoroutine(RotateFace(Side.Top, RotateDir.CW));
+        yield return StartCoroutine(RotateFace(Side.Bottom, RotateDir.CCW));
+        yield return StartCoroutine(RotateFace(Side.Right, RotateDir.CW));
+        yield return StartCoroutine(RotateFace(Side.Bottom, RotateDir.CCW));
+        yield return StartCoroutine(RotateFace(Side.Right, RotateDir.CW));
+        yield return StartCoroutine(RotateFace(Side.Bottom, RotateDir.CW));
+        yield return StartCoroutine(RotateFace(Side.Back, RotateDir.CW));
+        yield return StartCoroutine(RotateFace(Side.Top, RotateDir.CW));
+        yield return StartCoroutine(RotateFace(Side.Bottom, RotateDir.CW));
+        yield return StartCoroutine(RotateFace(Side.Front, RotateDir.CW));
+        yield return StartCoroutine(RotateFace(Side.Front, RotateDir.CW));
+        yield return StartCoroutine(RotateFace(Side.Back, RotateDir.CW));
+    }
+
+    public IEnumerator ScrambleCube(int s)
     {
-        if (Input.GetKeyUp(KeyCode.P))
+        int seed = s;
+        UnityEngine.Random.InitState(seed);
+        int num_rotations = UnityEngine.Random.Range(15, 26); // 15 to 25
+
+        Debug.Log("Num rotations: " + num_rotations);
+
+        Action NextSeed = () =>
         {
-            yield return StartCoroutine(RotateFace(Side.Right, RotateDir.CW));
-            yield return StartCoroutine(RotateFace(Side.Left, RotateDir.CW));
-            yield return StartCoroutine(RotateFace(Side.Top, RotateDir.CW));
-            yield return StartCoroutine(RotateFace(Side.Bottom, RotateDir.CCW));
-            yield return StartCoroutine(RotateFace(Side.Right, RotateDir.CW));
-            yield return StartCoroutine(RotateFace(Side.Bottom, RotateDir.CCW));
-            yield return StartCoroutine(RotateFace(Side.Right, RotateDir.CW));
-            yield return StartCoroutine(RotateFace(Side.Bottom, RotateDir.CW));
-            yield return StartCoroutine(RotateFace(Side.Back, RotateDir.CW));
-            yield return StartCoroutine(RotateFace(Side.Back, RotateDir.CCW));
-            yield return StartCoroutine(RotateFace(Side.Top, RotateDir.CW));
-            yield return StartCoroutine(RotateFace(Side.Bottom, RotateDir.CW));
-            yield return StartCoroutine(RotateFace(Side.Front, RotateDir.CW));
-            yield return StartCoroutine(RotateFace(Side.Front, RotateDir.CW));
-            yield return StartCoroutine(RotateFace(Side.Back, RotateDir.CW));
+            seed++;
+            UnityEngine.Random.InitState(seed);
+        };
+
+        for (int rot = 0; rot < num_rotations; rot++)
+        {
+            NextSeed();
+            int rand_dir_num = UnityEngine.Random.Range(0, 2); // 0 to 1
+            RotateDir rand_dir = (rand_dir_num == 0 ? RotateDir.CW : RotateDir.CCW);
+            
+            NextSeed();
+            int rand_face_num = UnityEngine.Random.Range(0, 6); // 0 to 5
+            Side rand_side = (Side)rand_face_num;
+
+            yield return StartCoroutine(RotateFace(rand_side, rand_dir, 0.05f));
         }
+
+        yield return null;
     }
 
     IEnumerator MouseScrollBehaviour()
@@ -334,18 +360,8 @@ public class RubiksCubeManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        // Set seed scramble
-        if (Input.GetKeyUp(KeyCode.P))
-        {
-            StartCoroutine(DemoScramble());
-        }
-
-        // Reload scene.
-        if (Input.GetKeyUp(KeyCode.O))
-        {
-            SceneManager.LoadScene("SampleScene");
-        }
+        if (inputLocked)
+            return;
 
 
         if (Input.GetKeyUp(KeyCode.R))
@@ -424,20 +440,20 @@ public class RubiksCubeManager : MonoBehaviour
         StartCoroutine(MouseScrollBehaviour());
     }
 
-    IEnumerator RotateFace(Side s, RotateDir rotateDir)
+    IEnumerator RotateFace(Side s, RotateDir rotateDir, float time_max = 0.25f)
     {
         if (ready)
         {
             ready = false;
             float time = 0f;
-            float time_max = 0.25f;
             
             foreach (var c in cube_faces[(int)s].sideList)
                 c.GetComponent<MeshRenderer>().material.color = Color.magenta;
 
             while (time < time_max)
-            {
-                Quaternion rotation = Quaternion.AngleAxis((rotateDir == RotateDir.CW ? 360f : -360f) * time, cube_faces[(int)s].originPoint);
+            {   
+                float angle = Mathf.Lerp(0f, 90f, time / time_max);
+                Quaternion rotation = Quaternion.AngleAxis(rotateDir == RotateDir.CW ? angle : -angle, cube_faces[(int)s].originPoint);
 
                 foreach (var c in cube_faces[(int)s].sideList)
                 {

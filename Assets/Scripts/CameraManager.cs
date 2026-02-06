@@ -43,12 +43,19 @@ public class CameraManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        AlignSideCameras(0);
+        AlignSideCameras(0, CameraVert.Up);
     }
-    void AlignSideCameras(int camera_face_index)
+    void AlignSideCameras(int camera_face_index, CameraVert cameraVert)
     {
         int right_camera_index = (camera_face_index + 1) % (int)CameraHoriz.Count;
         int left_camera_axis_index = (camera_face_index - 1 + (int)CameraHoriz.Count) % (int)CameraHoriz.Count;
+
+        if (cameraVert == CameraVert.Up)
+        {            
+            int temp = right_camera_index;
+            right_camera_index = left_camera_axis_index;
+            left_camera_axis_index = temp;
+        }
 
         // -----------------------------------------------------
         // Left camera
@@ -71,7 +78,8 @@ public class CameraManager : MonoBehaviour
                                               transform.rotation.eulerAngles.z);
     }
 
-    void OnRight()
+
+    void OnRight(CameraVert cameraVert)
     {
         int camera_axis_index = (int)cameraHoriz;
         camera_axis_index = (camera_axis_index + 1) % (int)CameraHoriz.Count;
@@ -94,12 +102,12 @@ public class CameraManager : MonoBehaviour
                                               cameraPlane.transform.rotation.eulerAngles.z);
         
         
-        AlignSideCameras(camera_axis_index);
+        AlignSideCameras(camera_axis_index, cameraVert);
 
         cameraHoriz = (CameraHoriz)camera_axis_index;
         rubiksCubeManager.ReCallibrateCube();
     }
-    void OnLeft()
+    void OnLeft(CameraVert cameraVert)
     {
         int camera_axis_index = (int)cameraHoriz;
         camera_axis_index = (camera_axis_index - 1 + (int)CameraHoriz.Count) % (int)CameraHoriz.Count;
@@ -120,7 +128,7 @@ public class CameraManager : MonoBehaviour
                                               cameraParams[(CameraHoriz)camera_axis_index].Item2.y, 
                                               cameraPlane.transform.rotation.eulerAngles.z);
 
-        AlignSideCameras(camera_axis_index);
+        AlignSideCameras(camera_axis_index, cameraVert);
 
         cameraHoriz = (CameraHoriz)camera_axis_index;
         rubiksCubeManager.ReCallibrateCube();
@@ -129,7 +137,7 @@ public class CameraManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!rubiksCubeManager.Ready)
+        if (!rubiksCubeManager.Ready || rubiksCubeManager.inputLocked)
             return;
 
         if (Input.GetKeyUp(KeyCode.UpArrow))
@@ -140,6 +148,8 @@ public class CameraManager : MonoBehaviour
             transform.rotation = Quaternion.Euler(+20f, transform.rotation.eulerAngles.y, 0f);
             cameraPlane.transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
             rubiksCubeManager.ReCallibrateCube();
+            
+            AlignSideCameras((int)cameraHoriz, cameraVert);
         }
         if (Input.GetKeyUp(KeyCode.DownArrow))
         {
@@ -149,20 +159,22 @@ public class CameraManager : MonoBehaviour
             transform.rotation = Quaternion.Euler(-20f, transform.rotation.eulerAngles.y, 180f);
             cameraPlane.transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 180f);
             rubiksCubeManager.ReCallibrateCube();
+            
+            AlignSideCameras((int)cameraHoriz, cameraVert);
         }
         if (Input.GetKeyUp(KeyCode.RightArrow))
         {
             if (cameraVert == CameraVert.Up)
-                OnRight();
+                OnRight(CameraVert.Up);
             else
-                OnLeft();
+                OnLeft(CameraVert.Down);
         }
         if (Input.GetKeyUp(KeyCode.LeftArrow))
         {
             if (cameraVert == CameraVert.Up)
-                OnLeft();
+                OnLeft(CameraVert.Up);
             else
-                OnRight();
+                OnRight(CameraVert.Down);
         }
 
     }
