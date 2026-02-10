@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6231589950260767448}
   m_Layer: 0
   m_Name: Green
-  m_TagString: CentreLayer
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 4277613656949197332}
   m_Layer: 0
   m_Name: Red
-  m_TagString: CentreLayer
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -353,6 +353,7 @@ MonoBehaviour:
   dotProduct: 0
   startPos: {x: 0, y: 0, z: 0}
   currentRot: {x: 0, y: 0, z: 0, w: 0}
+  cubieFace: {fileID: 0}
 --- !u!1 &3777004639952646184
 GameObject:
   m_ObjectHideFlags: 0
@@ -368,7 +369,7 @@ GameObject:
   - component: {fileID: 6270372532008965687}
   m_Layer: 0
   m_Name: Orange
-  m_TagString: CentreLayer
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -489,7 +490,7 @@ GameObject:
   - component: {fileID: 9047921868918927339}
   m_Layer: 0
   m_Name: White
-  m_TagString: TopLayer
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -610,7 +611,7 @@ GameObject:
   - component: {fileID: 3098019800417001081}
   m_Layer: 0
   m_Name: Yellow
-  m_TagString: TopLayer
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -731,7 +732,7 @@ GameObject:
   - component: {fileID: 5511431140618757150}
   m_Layer: 0
   m_Name: Blue
-  m_TagString: CentreLayer
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

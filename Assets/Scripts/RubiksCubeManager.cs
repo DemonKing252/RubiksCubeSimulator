@@ -44,11 +44,12 @@ public enum RotateDir
 
 public class RubiksCubeManager : MonoBehaviour
 {
+    private static RubiksCubeManager sInstance;
+    public static RubiksCubeManager Instance { get { return sInstance; } }
+
     private Cubie selectedCube;
     private List<Side> selectedSides;
 
-    [SerializeField]
-    private CameraManager cameraManager;
     private bool ready = true;
     public bool Ready { get { return ready; } }
     public List<Cubie> cubies;
@@ -59,7 +60,9 @@ public class RubiksCubeManager : MonoBehaviour
     public TMP_Text selectedCubeText;
     public TMP_Text selectedFaceText;
     public bool inputLocked = false;
+
     
+
     public Dictionary<CameraHoriz, Vector3> cameraVectors = new Dictionary<CameraHoriz, Vector3>()
     {
         { CameraHoriz.Minus_X, new Vector3(-1f, 0f, 0f)},
@@ -85,51 +88,51 @@ public class RubiksCubeManager : MonoBehaviour
             c.cubeFace.Clear();
 
             // Right face
-            if (Vector3.Dot(c.transform.position - Vector3.zero, cameraManager.cameraPlane.transform.right) > 0.95f)
+            if (Vector3.Dot(c.transform.position - Vector3.zero, CameraManager.Instance.cameraPlane.transform.right) > 0.95f)
             {
                 c.cubeFace.Add(Side.Right);
                 cube_faces[(int)Side.Right].sideList.Add(c.gameObject);
-                cube_faces[(int)Side.Right].originPoint = cameraManager.cameraPlane.transform.right;
+                cube_faces[(int)Side.Right].originPoint = CameraManager.Instance.cameraPlane.transform.right;
             }
 
             // Left face
-            if (Vector3.Dot(c.transform.position - Vector3.zero, -1f * cameraManager.cameraPlane.transform.right) > 0.95f)
+            if (Vector3.Dot(c.transform.position - Vector3.zero, -1f * CameraManager.Instance.cameraPlane.transform.right) > 0.95f)
             {
                 c.cubeFace.Add(Side.Left);
                 cube_faces[(int)Side.Left].sideList.Add(c.gameObject);
-                cube_faces[(int)Side.Left].originPoint = -1f * cameraManager.cameraPlane.transform.right;
+                cube_faces[(int)Side.Left].originPoint = -1f * CameraManager.Instance.cameraPlane.transform.right;
             }
 
             // Front face
-            if (Vector3.Dot(c.transform.position - Vector3.zero, -1f * cameraManager.cameraPlane.transform.forward) > 0.95f)
+            if (Vector3.Dot(c.transform.position - Vector3.zero, -1f * CameraManager.Instance.cameraPlane.transform.forward) > 0.95f)
             {
                 c.cubeFace.Add(Side.Front);
                 cube_faces[(int)Side.Front].sideList.Add(c.gameObject);
-                cube_faces[(int)Side.Front].originPoint = -1f * cameraManager.cameraPlane.transform.forward;
+                cube_faces[(int)Side.Front].originPoint = -1f * CameraManager.Instance.cameraPlane.transform.forward;
             }
 
             // Back face
-            if (Vector3.Dot(c.transform.position - Vector3.zero, cameraManager.cameraPlane.transform.forward) > 0.95f)
+            if (Vector3.Dot(c.transform.position - Vector3.zero, CameraManager.Instance.cameraPlane.transform.forward) > 0.95f)
             {
                 c.cubeFace.Add(Side.Back);
                 cube_faces[(int)Side.Back].sideList.Add(c.gameObject);
-                cube_faces[(int)Side.Back].originPoint = cameraManager.cameraPlane.transform.forward;
+                cube_faces[(int)Side.Back].originPoint = CameraManager.Instance.cameraPlane.transform.forward;
             }
 
             // Up Face
-            if (Vector3.Dot(c.transform.position - Vector3.zero, cameraManager.cameraPlane.transform.up) > 0.95f)
+            if (Vector3.Dot(c.transform.position - Vector3.zero, CameraManager.Instance.cameraPlane.transform.up) > 0.95f)
             {
                 c.cubeFace.Add(Side.Top);
                 cube_faces[(int)Side.Top].sideList.Add(c.gameObject);
-                cube_faces[(int)Side.Top].originPoint = cameraManager.cameraPlane.transform.up;
+                cube_faces[(int)Side.Top].originPoint = CameraManager.Instance.cameraPlane.transform.up;
             }
 
             // Down Face
-            if (Vector3.Dot(c.transform.position - Vector3.zero, -1f * cameraManager.cameraPlane.transform.up) > 0.95f)
+            if (Vector3.Dot(c.transform.position - Vector3.zero, -1f * CameraManager.Instance.cameraPlane.transform.up) > 0.95f)
             {
                 c.cubeFace.Add(Side.Bottom);
                 cube_faces[(int)Side.Bottom].sideList.Add(c.gameObject);
-                cube_faces[(int)Side.Bottom].originPoint = -1f * cameraManager.cameraPlane.transform.up;
+                cube_faces[(int)Side.Bottom].originPoint = -1f * CameraManager.Instance.cameraPlane.transform.up;
             }
 
         }
@@ -139,6 +142,10 @@ public class RubiksCubeManager : MonoBehaviour
             c.GetComponent<Cubie>().currentRot = c.transform.rotation;
         }
         ready = true;
+    }
+    void Awake()
+    {
+        sInstance = this;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -221,7 +228,7 @@ public class RubiksCubeManager : MonoBehaviour
                     Input.GetAxisRaw("Mouse Y")
                 );
 
-                if (mouseDelta.sqrMagnitude >= 0.001f)
+                if (mouseDelta.sqrMagnitude >= 0.004f)
                     break;
                 
                 if (Input.GetMouseButtonUp(0))  // Break if the player releases.
@@ -280,7 +287,7 @@ public class RubiksCubeManager : MonoBehaviour
             if (selectedCube.cubeFace.Contains(Side.Top) && selectedCube.cubeFace.Contains(Side.Front))
             {
                 // Scroll the Top.
-                if (cameraManager.cameraVert == CameraVert.Up ? 
+                if (CameraManager.Instance.cameraVert == CameraVert.Up ? 
                     selectedCube.cubieFace.transform.position.y < 1.4f : 
                     selectedCube.cubieFace.transform.position.y > -1.4f)
                 {

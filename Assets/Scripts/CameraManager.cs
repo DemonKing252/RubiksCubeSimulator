@@ -22,8 +22,11 @@ public enum CameraHoriz
 
 public class CameraManager : MonoBehaviour
 {
-    [SerializeField]
-    private RubiksCubeManager rubiksCubeManager;
+    private static CameraManager sInstance;
+    public static CameraManager Instance
+    {
+        get { return sInstance; }
+    }
     
     public CameraVert cameraVert;
     public CameraHoriz cameraHoriz;
@@ -39,6 +42,11 @@ public class CameraManager : MonoBehaviour
 
     public Camera rightCamera;
     public Camera leftCamera;
+
+    void Awake()
+    {
+        sInstance = this;
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -105,7 +113,7 @@ public class CameraManager : MonoBehaviour
         AlignSideCameras(camera_axis_index, cameraVert);
 
         cameraHoriz = (CameraHoriz)camera_axis_index;
-        rubiksCubeManager.ReCallibrateCube();
+        RubiksCubeManager.Instance.ReCallibrateCube();
     }
     void OnLeft(CameraVert cameraVert)
     {
@@ -131,13 +139,13 @@ public class CameraManager : MonoBehaviour
         AlignSideCameras(camera_axis_index, cameraVert);
 
         cameraHoriz = (CameraHoriz)camera_axis_index;
-        rubiksCubeManager.ReCallibrateCube();
+        RubiksCubeManager.Instance.ReCallibrateCube();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!rubiksCubeManager.Ready || rubiksCubeManager.inputLocked)
+        if (!RubiksCubeManager.Instance.Ready || RubiksCubeManager.Instance.inputLocked)
             return;
 
         if (Input.GetKeyUp(KeyCode.UpArrow))
@@ -147,7 +155,7 @@ public class CameraManager : MonoBehaviour
             cameraPlane.transform.position = new Vector3(transform.position.x, 3f, transform.position.z);
             transform.rotation = Quaternion.Euler(+20f, transform.rotation.eulerAngles.y, 0f);
             cameraPlane.transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
-            rubiksCubeManager.ReCallibrateCube();
+            RubiksCubeManager.Instance.ReCallibrateCube();
             
             AlignSideCameras((int)cameraHoriz, cameraVert);
         }
@@ -158,7 +166,7 @@ public class CameraManager : MonoBehaviour
             cameraPlane.transform.position = new Vector3(transform.position.x, -3f, transform.position.z);
             transform.rotation = Quaternion.Euler(-20f, transform.rotation.eulerAngles.y, 180f);
             cameraPlane.transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 180f);
-            rubiksCubeManager.ReCallibrateCube();
+            RubiksCubeManager.Instance.ReCallibrateCube();
             
             AlignSideCameras((int)cameraHoriz, cameraVert);
         }

@@ -11,7 +11,6 @@ public class UIManager : MonoBehaviour
     public TMP_InputField seedTextField;
     public Button scrambleButton;
     public Button resetButton;
-    public RubiksCubeManager rubiksCubeManager;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -21,13 +20,13 @@ public class UIManager : MonoBehaviour
         resetButton.onClick.AddListener(() => SceneManager.LoadScene("SampleScene"));
 
         scrambleButton.onClick.AddListener(
-            () => StartCoroutine(rubiksCubeManager.ScrambleCube(seedNumber)) 
+            () => StartCoroutine(RubiksCubeManager.Instance.ScrambleCube(seedNumber)) 
         );
         
         OnUpdatedText(seedTextField.text);
 
-        seedTextField.onSelect.AddListener((meta) => rubiksCubeManager.inputLocked = true );
-        seedTextField.onDeselect.AddListener((meta) => rubiksCubeManager.inputLocked = false );
+        seedTextField.onSelect.AddListener((meta) => RubiksCubeManager.Instance.inputLocked = true );
+        seedTextField.onDeselect.AddListener((meta) => RubiksCubeManager.Instance.inputLocked = false );
     }
 
     void OnUpdatedText(string seed)

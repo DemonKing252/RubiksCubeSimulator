@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Cubie : MonoBehaviour
 {
-    public LayerID layer;
     public List<Side> cubeFace;
     public RubiksCubeManager cubeMan;
     public Vector3 diff;
@@ -33,16 +32,14 @@ public class Cubie : MonoBehaviour
         Gizmos.DrawLine(transform.position, transform.position + Camera.main.transform.right);
     }
 
-    public void _OnMouseDown(CubieFace cubieFace, LayerID layer)
+    public void _OnMouseDown(CubieFace cubieFace)
     {
         this.cubieFace = cubieFace;
-        this.layer = layer;
         cubeMan.CheckClickedSide(this);
     }
-    public void _OnMouseUp(CubieFace cubieFace, LayerID layer)
+    public void _OnMouseUp(CubieFace cubieFace)
     {
         this.cubieFace = null;
-        this.layer = LayerID.None;
         cubeMan.OnCubeReleased(this);        
         GetComponent<MeshRenderer>().material.color = Color.black;
     }
